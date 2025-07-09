@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -67,14 +68,22 @@ func result(done chan bool) {
 			result.job.num,
 			result.total,
 		)
+		time.Sleep(5 * time.Second)
 	}
 	done <- true
 }
 
 func main() {
+	go func() {
+		for {
+			fmt.Println("Goroutines:", runtime.NumGoroutine())
+			time.Sleep(2 * time.Second)
+		}
+	}()
 	go allocateJob()
 	done := make(chan bool)
 	go result(done)
 	createWorkePool()
+
 	<-done
 }
